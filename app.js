@@ -428,8 +428,6 @@ async function renderVouchers(search = '') {
         .slice(0,3)
         .join(', ');
       const narr  = (v.entries||[]).find(e => e.narration)?.narration || '';
-      let badge = '';
-      if (v.locked) badge = `<span class="vou-badge badge-locked">Locked</span>`;
       const el = document.createElement('div');
       el.className = 'vou-row';
       el.innerHTML = `
@@ -636,9 +634,7 @@ async function openVoucherView(id) {
   const accounts = await getAccounts();
   const accMap   = Object.fromEntries(accounts.map(a => [a.id, a.name]));
 
-  document.getElementById('modal-vview-title').textContent = `Voucher ${v.id}`;
-
-  let statusTxt = v.locked ? 'Locked' : 'Open';
+  document.getElementById('modal-vview-title').textContent = 'Voucher';
 
   const tBodyRows = (v.entries||[]).map(e => `
     <tr>
@@ -648,24 +644,14 @@ async function openVoucherView(id) {
       <td class="vv-num">${e.credit ? _fmt(e.credit) : ''}</td>
     </tr>`).join('');
 
-  const dr = (v.entries||[]).reduce((s,e) => s + (parseFloat(e.debit)||0), 0);
-  const cr = (v.entries||[]).reduce((s,e) => s + (parseFloat(e.credit)||0), 0);
-
   document.getElementById('modal-vview-body').innerHTML = `
     <div class="vv-meta">
-      <div class="vv-field"><span>Voucher ID</span><strong class="vv-id">${_esc(v.id)}</strong></div>
       <div class="vv-field"><span>Date</span><strong>${_fmtDate(v.date)}</strong></div>
-      <div class="vv-field"><span>Status</span><strong>${statusTxt}</strong></div>
     </div>
     <div style="overflow-x:auto">
       <table class="vv-table">
         <thead><tr><th>Account</th><th>Narration</th><th style="text-align:right">Debit</th><th style="text-align:right">Credit</th></tr></thead>
         <tbody>${tBodyRows}</tbody>
-        <tfoot><tr>
-          <td colspan="2" style="font-weight:700">Total</td>
-          <td class="vv-num" style="font-weight:700">${_fmt(dr)}</td>
-          <td class="vv-num" style="font-weight:700">${_fmt(cr)}</td>
-        </tr></tfoot>
       </table>
     </div>`;
 
